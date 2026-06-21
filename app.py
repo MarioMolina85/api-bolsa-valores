@@ -52,39 +52,45 @@ def mostrar_tabla(df, ticker):
     st.write(f"Ticker: {ticker}")
     st.write(f"Registros: {len(df)}")
 
-# ==========================================
-# mostrando las estadisticas de la bolsa de valores
-# ==========================================
+#funcion para mostrar las estadisticas
 def mostrar_estadisticas(df):
     st.subheader("📊 Estadísticas Descriptivas")
     st.dataframe(df.describe())
     st.subheader("📊 Analisis descriptivo")
-    st.write("Veer los valores nulos",df.isnull().sum())
-    st.write("")
+    st.write("Ver los valores nulos",df.isnull().sum())
+    st.write("Ver valores Duplicados",df.duplicated().sum())
+    st.write("Ver los tipos de datos ",df.dtypes)
+    st.write("Dimension de los datos",df.shape)
+    st.write("Ultimos registro de la base",df.tail(5))
 
 #mostrando la grafica lineal para ver el tiempo y los precios de cierre
 def grafico_cierre(df, ticker):
+    st.subheader("Grafico lineal para visualizar su tendencia ver sus movimientos historicos")
     fig = px.line( df, x="Date",  y="Close",  title=f"Precio de Cierre - {ticker}" )
     st.plotly_chart(fig, use_container_width=True)
 
 #funcion para ver el volumne de transaciones realezada
 def grafico_volumen(df, ticker):
+    st.subheader("frecuencia de transaciones que se realizaron en el tiempo")
     fig = px.bar(df,  x="Date",  y="Volume", title=f"Volumen - {ticker}")
     st.plotly_chart(fig, use_container_width=True)
 
 
 def histograma_precio(df):
+    st.subheader("Distribucion de los precios ")
     fig = px.histogram(  df, x="Close", nbins=50,title="Distribución Precio Cierre" )
     st.plotly_chart(fig, use_container_width=True)
 
 #funcion para ver el retorno
 def histograma_retorno(df):
+    st.subheader("Retorno una metrica financiera para medir  el porcentaje de ganancia y perdidad de la inversion")
     df["Retorno"] = df["Close"].pct_change()
     fig = px.histogram( df, x="Retorno",nbins=50,title="Distribución de Retornos" )
     st.plotly_chart(fig, use_container_width=True)
 
 #funcion para ver la correlacion de precios cierre, abiertos, volumnes, bajos
 def matriz_correlacion(df):
+    st.subheader("Relacion de variables ")
     columnas = [ "Open","High","Low","Close",  "Volume"]
     corr = df[columnas].corr()
     st.subheader("🔗 Correlación")
@@ -92,7 +98,7 @@ def matriz_correlacion(df):
 
 
 def reporte_ydata(df, ticker):
-
+    st.subheader("Generacion de Analisis exploratorio de la data")
     st.subheader("📑 YData Profiling")
     profile = ProfileReport( df,title=f"Perfil {ticker}",explorative=True )
     st_profile_report(profile)
@@ -171,6 +177,10 @@ def evaluar_modelo(nombre, y_real, y_pred):
     mae = mean_absolute_error(y_real, y_pred)
     rmse = np.sqrt(mean_squared_error(y_real, y_pred))
     r2 = r2_score(y_real, y_pred)
+    if r2>=0.60:
+        st.write("Modelo es bueno para realizar una inversion")
+    else:
+        st.write("Modelo no es bueno hay una negativa la relacion esta en caida l mercado")
     st.write(f"### {nombre}")
     st.write(f"MAE : {mae:.4f}")
     st.write(f"RMSE: {rmse:.4f}")
@@ -260,22 +270,15 @@ def mostrar_kpis(df):
     volatilidad = (
         df["Close"].pct_change().std()
     ) * 100
-
     registros = len(df)
 
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric(
-            "💰 Precio Actual",
-            f"${precio_actual:,.2f}"
-        )
+        st.metric( "💰 Precio Actual", f"${precio_actual:,.2f}")
 
     with col2:
-        st.metric(
-            "📈 Precio Máximo",
-            f"${precio_max:,.2f}"
-        )
+        st.metric( "📈 Precio Máximo",  f"${precio_max:,.2f}" )
 
     with col3:
         st.metric(
@@ -315,6 +318,8 @@ def mostrar_kpis(df):
 def main():
 
     st.title("📈 Análisis Bolsa de Valores")
+    st.subheader("aplicacion para consultar y explorar datos financieros de mercado bursatil ")
+    st.write("Formulario de seleccion de Sector Finaciero y la fechas")
     opciones = obtener_empresas()
     empresa = st.selectbox("Seleccione empresa", list(opciones.keys()))
     ticker = opciones[empresa]
