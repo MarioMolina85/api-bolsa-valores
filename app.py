@@ -37,7 +37,7 @@ def obtener_empresas():
     }
 
 #funcion para cargar la data 
-@st.cache_data
+
 def descargar_datos(ticker, fecha_inicio, fecha_fin):
     df = yf.download( ticker, start=fecha_inicio, end=fecha_fin, auto_adjust=True)
     if isinstance(df.columns, pd.MultiIndex):
