@@ -37,7 +37,7 @@ def obtener_empresas():
     }
 
 #funcion para cargar la data 
-
+@st.cache_data
 def descargar_datos(ticker, fecha_inicio, fecha_fin):
     df = yf.download( ticker, start=fecha_inicio, end=fecha_fin, auto_adjust=True)
     if isinstance(df.columns, pd.MultiIndex):
@@ -84,16 +84,6 @@ def mostrar_estadisticas(df):
     quartiles=df[(df[columna]<(Q1-1.5*IQR))|(df[columna]>(Q3+1.5*IQR))]
     st.write(quartiles)
     st.header("Grafica de Outlier de Precio Close")
-    st.title("Detección de Outliers")
-
-    fig = px.box(
-        df,
-        y="Close",
-        points="all",
-        title="Boxplot de Precio de Cierre"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
     st.write("Ver el numero de duplicados", df.duplicated().sum())
     
 
