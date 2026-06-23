@@ -32,7 +32,8 @@ def obtener_empresas():
         "S&P 500 ETF": "SPY",
         "Nasdaq ETF": "QQQ",
         "Dow Jones ETF": "DIA",
-        "Bitcoin ETF": "BITO"
+        "Bitcoin ETF": "BITO",
+        "Petrolio":"CL=F"
     }
 
 #funcion para cargar la data 
@@ -62,6 +63,39 @@ def mostrar_estadisticas(df):
     st.write("Ver los tipos de datos ",df.dtypes)
     st.write("Dimension de los datos",df.shape)
     st.write("Ultimos registro de la base",df.tail(5))
+    st.write("Ver los Datos nulos", df[df.isnull().any(axis=1)])
+    st.write("Remplazando los valores nulos...")
+    df["Close"].fillna(df["Close"].mean(), inplace=True)
+    df.dropna(inplace=True)
+    df.rename({"Close":"Precio_cierre", "Low":"Precio_minimo"})
+    dfingresos=df[(df["Close"]>200) & (df["Close"]<500)]
+    st.write("Realizamos Una filtracion de los Datos de precios entre 200 y 500")
+    st.dataframe(dfingresos)
+    st.header("ver las columnas las columnas")
+    columnss=df.rename({"Close":"Precio_cierre", "low":"Precio_minimo"})
+    st.write(columnss)
+    df["Date"]=pd.to_datetime(df["Date"])
+    #ver el boxplot de los datos de precios de cierr
+    st.header("Ver los Outliers de el Precio Close")
+    columna="Close"
+    Q1 = df[columna].quantile(0.25)
+    Q3 = df[columna].quantile(0.75)
+    IQR = Q3 - Q1
+    quartiles=df[(df[columna]<(Q1-1.5*IQR))|(df[columna]>(Q3+1.5*IQR))]
+    st.write(quartiles)
+    st.header("Grafica de Outlier de Precio Close")
+    st.title("Detección de Outliers")
+
+    fig = px.box(
+        df,
+        y="Close",
+        points="all",
+        title="Boxplot de Precio de Cierre"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+    st.write("Ver el numero de duplicados", df.duplicated().sum())
+    
 
 #mostrando la grafica lineal para ver el tiempo y los precios de cierre
 def grafico_cierre(df, ticker):
@@ -316,7 +350,6 @@ def mostrar_kpis(df):
 # ==========================================
 
 def main():
-
     st.title("📈 Análisis Bolsa de Valores")
     st.subheader("aplicacion para consultar y explorar datos financieros de mercado bursatil ")
     st.write("Formulario de seleccion de Sector Finaciero y la fechas")
@@ -338,9 +371,8 @@ def main():
         )
 
     if st.button("Consultar Datos"):
-
         df = descargar_datos( ticker, fecha_inicio,fecha_fin )
-        
+        df.iloc[:np.random.randint(10, 30), 1:3]=np.nan
         if df.empty:
             st.error("No hay datos.")
             return
