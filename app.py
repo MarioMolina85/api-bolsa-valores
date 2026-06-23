@@ -35,8 +35,7 @@ def obtener_empresas():
         "Bitcoin ETF": "BITO",
         "Petrolio":"CL=F"
     }
-st.cache_data.clear()
-st.cache_resource.clear()
+@st.cache_data.clear()
 #funcion para cargar la data 
 @st.cache_data
 def descargar_datos(ticker, fecha_inicio, fecha_fin):
