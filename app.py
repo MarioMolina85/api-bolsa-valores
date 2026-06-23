@@ -254,39 +254,6 @@ def ejecutar_modelos(df):
     st.plotly_chart(fig, use_container_width=True)
 
 
-def mostrar_kpis_avanzados(df):
-
-    retorno_diario = df["Close"].pct_change()
-
-    rendimiento_anual = retorno_diario.mean() * 252 * 100
-
-    riesgo_anual = retorno_diario.std() * np.sqrt(252) * 100
-
-    sharpe = (
-        rendimiento_anual / riesgo_anual
-        if riesgo_anual != 0 else 0
-    )
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(
-            "📈 Rendimiento Anual",
-            f"{rendimiento_anual:.2f}%"
-        )
-
-    with col2:
-        st.metric(
-            "⚠️ Riesgo Anual",
-            f"{riesgo_anual:.2f}%"
-        )
-
-    with col3:
-        st.metric(
-            "🏆 Ratio Sharpe",
-            f"{sharpe:.2f}"
-        )
-
 def mostrar_kpis(df):
     st.subheader("📊 Indicadores Clave (KPIs)")
 
@@ -381,8 +348,6 @@ def main():
 
         mostrar_estadisticas(df)
         mostrar_kpis(df)
-        mostrar_kpis_avanzados(df)
-
         grafico_cierre(df, ticker)
 
         grafico_volumen(df, ticker)
